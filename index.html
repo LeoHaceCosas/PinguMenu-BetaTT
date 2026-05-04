@@ -3,180 +3,228 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PinguMenú v0.8 | Gourmet 🐧</title>
+    <title>PinguMenú v0.9 🐧</title>
     
-    <!-- SDK EmailJS -->
+    <!-- Librería de Correo (Gratis) -->
     <script src="https://jsdelivr.net"></script>
     <link href="https://googleapis.com" rel="stylesheet">
 
     <style>
         :root { 
             --primary: #48cae4; --secondary: #0077b6; --accent: #ff4d6d; 
-            --bg: #caf0f8; --glass: rgba(255, 255, 255, 0.9); 
+            --bg: #caf0f8; --glass: rgba(255, 255, 255, 0.92); 
         }
+
         body { 
             font-family: 'Poppins', sans-serif; 
             background: linear-gradient(135deg, #caf0f8 0%, #90e0ef 100%); 
             margin: 0; display: flex; justify-content: center; align-items: center; 
-            min-height: 100vh; color: #023e8a; 
+            min-height: 100vh; color: #023e8a; overflow-x: hidden;
         }
+
         .container { 
-            background: var(--glass); backdrop-filter: blur(10px); 
-            border-radius: 24px; padding: 30px; width: 90%; max-width: 800px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.3); 
+            background: var(--glass); backdrop-filter: blur(15px); 
+            border-radius: 28px; padding: 30px; width: 90%; max-width: 800px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.4); 
+            animation: slideUp 0.4s ease-out;
         }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
         .hidden { display: none !important; }
-        h1, h2, h3 { text-align: center; margin-top: 0; }
+        
+        /* Pantalla Login */
         .login-card { text-align: center; padding: 60px 20px; }
         input[type="text"] { 
-            padding: 12px; width: 80%; max-width: 300px; border-radius: 12px; 
-            border: 1px solid #ddd; margin-bottom: 20px; outline: none; text-align: center;
+            padding: 14px; width: 85%; max-width: 320px; border-radius: 15px; 
+            border: 2px solid #ddd; margin-bottom: 20px; outline: none; 
+            text-align: center; font-size: 1rem; transition: 0.3s;
         }
-        .product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; }
+        input[type="text"]:focus { border-color: var(--secondary); box-shadow: 0 0 10px rgba(0,119,182,0.15); }
+
+        /* Productos */
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 15px; }
         .card { 
-            background: white; padding: 20px; border-radius: 20px; text-align: center; 
-            transition: 0.3s; border: 1px solid transparent; box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            background: white; padding: 20px; border-radius: 22px; text-align: center; 
+            transition: 0.3s; border: 1px solid transparent; box-shadow: 0 4px 10px rgba(0,0,0,0.03);
         }
-        .card:hover { transform: translateY(-5px); border-color: var(--primary); }
-        .price { font-size: 1.3rem; font-weight: 600; color: var(--secondary); }
-        .payment-box { margin: 20px 0; text-align: center; padding: 15px; background: rgba(255,255,255,0.5); border-radius: 15px; border: 1px dashed var(--primary); }
-        select { padding: 10px; border-radius: 10px; border: 1px solid var(--secondary); background: white; cursor: pointer; }
+        .card:hover { transform: translateY(-8px); border-color: var(--primary); box-shadow: 0 10px 20px rgba(0,0,0,0.08); }
+        .price { font-size: 1.4rem; font-weight: 600; color: var(--secondary); margin: 5px 0; }
+        
+        /* Botones */
         button { 
             cursor: pointer; background: var(--secondary); color: white; border: none; 
-            padding: 12px 25px; border-radius: 12px; font-weight: 600; transition: 0.2s; 
+            padding: 12px 28px; border-radius: 14px; font-weight: 600; transition: 0.2s; 
         }
-        button:hover { filter: brightness(1.1); }
-        button:disabled { background: #adb5bd; cursor: not-allowed; }
+        button:hover { filter: brightness(1.1); transform: scale(1.03); }
+        button:active { transform: scale(0.97); }
+        button:disabled { background: #adb5bd; cursor: not-allowed; transform: none; }
+        
         .btn-clear { background: var(--accent); margin-top: 15px; font-size: 0.8rem; }
-        .history-list { max-height: 180px; overflow-y: auto; background: white; border-radius: 12px; padding: 10px; margin-top: 10px; border: 1px solid #eee; }
-        .history-item { font-size: 0.8rem; border-bottom: 1px solid #f8f8f8; padding: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .tag { font-size: 0.65rem; background: #e0f2fe; padding: 2px 8px; border-radius: 20px; color: #0369a1; font-weight: bold; }
+        .btn-logout { background: rgba(0,0,0,0.05); color: #666; font-size: 0.75rem; padding: 6px 15px; border: 1px solid #ccc; }
+
+        /* Historial */
+        .history-list { max-height: 160px; overflow-y: auto; background: white; border-radius: 16px; padding: 12px; margin-top: 10px; }
+        .history-item { font-size: 0.85rem; border-bottom: 1px solid #f5f5f5; padding: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .tag-pago { font-size: 0.7rem; background: #e0f2fe; padding: 3px 10px; border-radius: 12px; color: #0369a1; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <!-- Pantalla de Login -->
-    <div id="login-box" class="container login-card">
-        <h1>🐧 PinguMenú v0.8</h1>
-        <p>¡Hola! Ingresa tu nombre para ver los productos:</p>
-        <input type="text" id="user-input" placeholder="Tu nombre aquí">
-        <br>
-        <button id="login-btn">Entrar</button>
+<!-- LOGIN -->
+<div id="login-box" class="container login-card">
+    <div style="font-size: 4rem; margin-bottom: 10px;">🐧</div>
+    <h1>PinguMenú v0.9</h1>
+    <p style="color: #666;">Ingresa tu nombre para comenzar la orden</p>
+    <input type="text" id="user-input" placeholder="Nombre del Pingu-cliente" autocomplete="off">
+    <br>
+    <button onclick="checkAccess()">Entrar al Menú</button>
+</div>
+
+<!-- APP -->
+<div id="app" class="container hidden">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+        <h2 id="welcome-user" style="margin:0; font-size: 1.3rem;">¡Hola!</h2>
+        <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
     </div>
 
-    <!-- App Principal -->
-    <div id="app" class="container hidden">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2 id="welcome-user" style="margin:0; font-size: 1.2rem;">Hola</h2>
-            <button onclick="logout()" style="background:#666; font-size: 0.7rem; padding: 5px 12px;">Cerrar Sesión</button>
-        </div>
-
-        <div class="payment-box">
-            <label style="font-weight: 600;">Método de Pago: </label>
-            <select id="payment-method">
-                <option value="Efectivo">💵 Efectivo</option>
-                <option value="PinguCard Deud">💳 PinguCard Deud</option>
-            </select>
-        </div>
-
-        <!-- AQUÍ APARECEN LOS PRODUCTOS -->
-        <div class="product-grid" id="menu-container"></div>
-
-        <div class="history-section">
-            <h3 style="margin-top: 25px; font-size: 1rem;">📜 Recibos Recientes</h3>
-            <div id="history-list" class="history-list"></div>
-            <center><button class="btn-clear" onclick="clearHistory()">Limpiar Historial</button></center>
-        </div>
+    <div style="text-align: center; margin-bottom: 20px; background: rgba(255,255,255,0.4); padding: 15px; border-radius: 18px;">
+        <label style="font-weight: 600;">Método de Pago: </label>
+        <select id="payment-method" style="padding: 8px; border-radius: 10px; border: 1px solid var(--secondary); outline: none;">
+            <option value="Efectivo">💵 Efectivo</option>
+            <option value="PinguCard Deud">💳 PinguCard Deud</option>
+        </select>
     </div>
+
+    <div class="product-grid" id="menu-container"></div>
+
+    <div style="margin-top: 35px; border-top: 2px solid rgba(0,0,0,0.05); pt-4">
+        <h3 style="margin-bottom: 10px;">Pedidos Recientes</h3>
+        <div id="history-list" class="history-list"></div>
+        <center><button class="btn-clear" onclick="clearHistory()">Borrar Historial</button></center>
+    </div>
+</div>
 
 <script>
-    // --- 1. CONFIGURACIÓN EMAILJS ---
-    const KEY = "PalD6ERYCDIHXPkHH";
-    const SVC = "service_vphqove";
-    const TMP = "template_4ggzur2";
+    // --- CONFIGURACIÓN ---
+    // Regístrate en emailjs.com y pega tus llaves aquí:
+    const PUBLIC_KEY = "PalD6ERYCDIHXPkHH"; 
+    const SERVICE_ID = "service_vphqove";
+    const TEMPLATE_ID = "template_4ggzur2";
 
-    // Esperar a que cargue todo para evitar pantalla blanca
-    document.addEventListener("DOMContentLoaded", () => {
-        emailjs.init(KEY);
+    // Inicialización de EmailJS
+    (function(){
+        if(PUBLIC_KEY !== "PalD6ERYCDIHXPkHH") emailjs.init(PUBLIC_KEY);
+    })();
 
-        const catalog = [
-            { id: 1, name: "Sandwiché", price: 45, stock: 10, icon: "🥪" },
-            { id: 2, name: "Salchichas Catsup", price: 30, stock: 15, icon: "🌭" },
-            { id: 3, name: "Huevito", price: 25, stock: 8, icon: "🍳" },
-            { id: 4, name: "Pequesadilla", price: 35, stock: 12, icon: "🌮" }
-        ];
+    const menuData = [
+        { id: 1, name: "Sandwiché", price: 45, stock: 10, icon: "🥪" },
+        { id: 2, name: "Salchichas Catsup", price: 30, stock: 15, icon: "🌭" },
+        { id: 3, name: "Huevito", price: 25, stock: 8, icon: "🍳" },
+        { id: 4, name: "Pequesadilla", price: 35, stock: 12, icon: "🌮" }
+    ];
 
-        let products = JSON.parse(localStorage.getItem('pm08_stock')) || catalog;
-        let history = JSON.parse(localStorage.getItem('pm08_history')) || [];
-        let activeUser = localStorage.getItem('pm08_session');
+    let products = JSON.parse(localStorage.getItem('p_stock')) || menuData;
+    let history = JSON.parse(localStorage.getItem('p_history')) || [];
+    let activeUser = localStorage.getItem('p_user');
 
-        const loginBtn = document.getElementById('login-btn');
-        const userInput = document.getElementById('user-input');
+    // Al cargar
+    window.onload = () => { if(activeUser) startApp(activeUser); };
 
-        // Función para renderizar el menú
-        window.render = () => {
-            const container = document.getElementById('menu-container');
-            container.innerHTML = products.map(p => `
-                <div class="card">
-                    <div style="font-size: 2.8rem;">${p.icon}</div>
-                    <h4>${p.name}</h4>
-                    <div class="price">$${p.price}</div>
-                    <div style="font-size: 0.7rem; color:#888; margin-bottom: 10px;">Disponibles: ${p.stock}</div>
-                    <button onclick="buy(${p.id})" ${p.stock === 0 ? 'disabled' : ''}>
-                        ${p.stock > 0 ? 'Comprar' : 'Agotado'}
-                    </button>
-                </div>
-            `).join('');
+    function checkAccess() {
+        const val = document.getElementById('user-input').value.trim();
+        
+        if (val.toLowerCase() === 'reset') {
+            localStorage.clear();
+            alert("Memoria reseteada 🐧");
+            location.reload();
+            return;
+        }
 
-            const hList = document.getElementById('history-list');
-            hList.innerHTML = history.length ? history.map(h => `
-                <div class="history-item">
-                    <span><b>${h.item}</b> <span class="tag">${h.method}</span></span>
-                    <span>$${h.price} <small style="color:#999;">${h.time}</small></span>
-                </div>
-            `).reverse().join('') : '<p style="text-align:center; color:#999; font-size:0.8rem;">Sin pedidos.</p>';
-        };
+        if (val.length >= 2) {
+            localStorage.setItem('p_user', val);
+            startApp(val);
+        } else {
+            alert("Escribe un nombre de al menos 2 letras");
+        }
+    }
 
-        window.buy = (id) => {
-            const p = products.find(x => x.id === id);
-            const method = document.getElementById('payment-method').value;
-            if (p.stock > 0) {
-                p.stock--;
-                const order = { item: p.name, price: p.price, method: method, time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) };
-                history.push(order);
-                localStorage.setItem('pm08_stock', JSON.stringify(products));
-                localStorage.setItem('pm08_history', JSON.stringify(history));
-                render();
-                emailjs.send(SVC, TMP, { user_name: activeUser, order_details: order.item, total_price: `$${order.price}`, payment_method: order.method });
-            }
-        };
+    function startApp(name) {
+        document.getElementById('login-box').classList.add('hidden');
+        document.getElementById('app').classList.remove('hidden');
+        document.getElementById('welcome-user').innerText = `¡Bienvenido, ${name}! 🐧`;
+        render();
+    }
 
-        window.logout = () => { localStorage.removeItem('pm08_session'); location.reload(); };
-        window.clearHistory = () => { if(confirm("¿Limpiar historial?")) { history = []; localStorage.setItem('pm08_history', JSON.stringify(history)); render(); } };
+    function logout() {
+        localStorage.removeItem('p_user');
+        location.reload();
+    }
 
-        const startApp = (name) => {
-            activeUser = name;
-            document.getElementById('login-box').classList.add('hidden');
-            document.getElementById('app').classList.remove('hidden');
-            document.getElementById('welcome-user').innerText = `¡Bienvenido, ${name}! 🐧`;
+    function buy(id) {
+        const p = products.find(x => x.id === id);
+        const method = document.getElementById('payment-method').value;
+
+        if (p.stock > 0) {
+            p.stock--;
+            const order = {
+                item: p.name,
+                price: p.price,
+                method: method,
+                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+            };
+            
+            history.push(order);
+            saveData();
             render();
-        };
-
-        loginBtn.addEventListener('click', () => {
-            const val = userInput.value.trim();
-            if (val.toLowerCase() === 'reset') {
-                localStorage.clear();
-                location.reload();
-            } else if (val.length >= 2) {
-                localStorage.setItem('pm08_session', val);
-                startApp(val);
+            
+            // Envío de correo
+            if(PUBLIC_KEY !== "TU_PUBLIC_KEY") {
+                emailjs.send(SERVICE_ID, TEMPLATE_ID, {
+                    user_name: localStorage.getItem('p_user'),
+                    order_details: order.item,
+                    total_price: `$${order.price}`,
+                    payment_method: order.method
+                });
             }
-        });
+        }
+    }
 
-        if(activeUser) startApp(activeUser);
-    });
+    function render() {
+        const container = document.getElementById('menu-container');
+        container.innerHTML = products.map(p => `
+            <div class="card">
+                <div style="font-size: 3rem; margin-bottom: 10px;">${p.icon}</div>
+                <h4 style="margin:5px 0;">${p.name}</h4>
+                <div class="price">$${p.price}</div>
+                <div style="font-size: 0.75rem; color:#888; margin-bottom: 15px;">Stock: ${p.stock}</div>
+                <button onclick="buy(${p.id})" ${p.stock === 0 ? 'disabled' : ''}>
+                    ${p.stock > 0 ? 'Comprar' : 'Agotado'}
+                </button>
+            </div>
+        `).join('');
+
+        const hList = document.getElementById('history-list');
+        hList.innerHTML = history.length ? history.map(h => `
+            <div class="history-item">
+                <span><b>${h.item}</b> <span class="tag-pago">${h.method}</span></span>
+                <span>$${h.price} <small style="color:#aaa; margin-left:8px;">${h.time}</small></span>
+            </div>
+        `).reverse().join('') : '<p style="text-align:center; color:#999; font-size:0.8rem;">Sin pedidos registrados.</p>';
+    }
+
+    function clearHistory() {
+        if(confirm("¿Seguro que quieres limpiar el historial de compras?")) {
+            history = [];
+            saveData();
+            render();
+        }
+    }
+
+    function saveData() {
+        localStorage.setItem('p_stock', JSON.stringify(products));
+        localStorage.setItem('p_history', JSON.stringify(history));
+    }
 </script>
 </body>
 </html>
-
-    
