@@ -5,100 +5,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PinguMenú | Gourmet 🐧</title>
     
-    <!-- Scripts Externos -->
-    <script src="https://google.com" async defer></script>
+    <!-- SDK de EmailJS para envío de correos -->
     <script src="https://jsdelivr.net"></script>
     <link href="https://googleapis.com" rel="stylesheet">
 
     <style>
         :root { 
-            --primary: #48cae4; 
-            --secondary: #0077b6; 
-            --accent: #ff4d6d; 
-            --bg: #caf0f8; 
-            --glass: rgba(255, 255, 255, 0.85); 
+            --primary: #48cae4; --secondary: #0077b6; --accent: #ff4d6d; 
+            --bg: #caf0f8; --glass: rgba(255, 255, 255, 0.9); 
         }
 
         body { 
             font-family: 'Poppins', sans-serif; 
             background: linear-gradient(135deg, #caf0f8 0%, #90e0ef 100%); 
-            margin: 0; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            color: #023e8a; 
+            margin: 0; display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; color: #023e8a; 
         }
 
         .container { 
-            background: var(--glass); 
-            backdrop-filter: blur(10px); 
-            border-radius: 24px; 
-            padding: 30px; 
-            width: 90%; 
-            max-width: 850px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
-            border: 1px solid rgba(255,255,255,0.3); 
-            animation: fadeIn 0.5s ease-out; 
+            background: var(--glass); backdrop-filter: blur(10px); 
+            border-radius: 24px; padding: 30px; width: 90%; max-width: 800px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.3); 
         }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .hidden { display: none !important; }
         h1, h2, h3 { text-align: center; margin-top: 0; }
 
         /* Login */
-        .login-card { text-align: center; padding: 50px 20px; }
-        input[type="text"] { padding: 12px; width: 250px; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 15px; outline: none; transition: 0.3s; }
-        input[type="text"]:focus { border-color: var(--secondary); box-shadow: 0 0 8px rgba(0,119,182,0.2); }
+        .login-card { text-align: center; padding: 60px 20px; }
+        input[type="text"] { 
+            padding: 12px; width: 80%; max-width: 300px; border-radius: 12px; 
+            border: 1px solid #ddd; margin-bottom: 20px; outline: none; text-align: center;
+        }
 
-        /* Tienda */
-        .product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
-        .card { background: white; padding: 15px; border-radius: 18px; text-align: center; transition: 0.3s; border: 1px solid transparent; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-        .card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 8px 15px rgba(0,0,0,0.05); }
-        .price { font-size: 1.25rem; font-weight: 600; color: var(--secondary); margin: 5px 0; }
+        /* Grid */
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; }
+        .card { 
+            background: white; padding: 20px; border-radius: 20px; text-align: center; 
+            transition: 0.3s; border: 1px solid transparent; 
+        }
+        .card:hover { transform: translateY(-5px); border-color: var(--primary); }
+        .price { font-size: 1.3rem; font-weight: 600; color: var(--secondary); }
         
         /* Controles */
-        .payment-box { margin: 20px 0; text-align: center; background: rgba(255,255,255,0.4); padding: 15px; border-radius: 15px; }
-        select { padding: 8px; border-radius: 8px; border: 1px solid var(--secondary); background: white; cursor: pointer; font-family: inherit; }
+        .payment-box { margin: 20px 0; text-align: center; padding: 15px; background: rgba(255,255,255,0.5); border-radius: 15px; }
+        select { padding: 10px; border-radius: 10px; border: 1px solid var(--secondary); background: white; cursor: pointer; }
 
-        button { cursor: pointer; background: var(--secondary); color: white; border: none; padding: 10px 20px; border-radius: 12px; font-weight: 600; transition: 0.2s; }
+        button { 
+            cursor: pointer; background: var(--secondary); color: white; border: none; 
+            padding: 12px 25px; border-radius: 12px; font-weight: 600; transition: 0.2s; 
+        }
         button:hover { filter: brightness(1.1); transform: scale(1.02); }
-        button:active { transform: scale(0.98); }
-        button:disabled { background: #adb5bd; transform: none; cursor: not-allowed; }
+        button:disabled { background: #adb5bd; cursor: not-allowed; transform: none; }
         
-        .btn-logout { background: transparent; color: #666; font-size: 0.75rem; padding: 5px 10px; border: 1px solid #ccc; }
         .btn-clear { background: var(--accent); margin-top: 15px; font-size: 0.8rem; }
+        .btn-logout { background: #666; font-size: 0.7rem; padding: 5px 12px; }
 
         /* Historial */
-        .history-section { margin-top: 30px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 20px; }
-        .history-list { max-height: 180px; overflow-y: auto; background: rgba(255,255,255,0.5); border-radius: 12px; padding: 10px; }
-        .history-item { font-size: 0.8rem; border-bottom: 1px solid rgba(0,0,0,0.05); padding: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .tag-pago { font-size: 0.65rem; background: #e0f2fe; padding: 2px 8px; border-radius: 20px; color: #0369a1; font-weight: bold; margin-left: 8px; }
+        .history-list { max-height: 150px; overflow-y: auto; background: white; border-radius: 12px; padding: 10px; margin-top: 10px; }
+        .history-item { font-size: 0.8rem; border-bottom: 1px solid #f0f0f0; padding: 8px; display: flex; justify-content: space-between; }
+        .tag { font-size: 0.6rem; background: #e0f2fe; padding: 2px 6px; border-radius: 10px; color: #0369a1; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<!-- Pantalla de Login -->
+<!-- Pantalla de Inicio -->
 <div id="login-box" class="container login-card">
     <h1>🐧 PinguMenú</h1>
-    <div id="g_id_onload" data-client_id="TU_ID_GOOGLE" data-callback="handleGoogle"></div>
-    <div class="g_id_signin" data-type="standard" style="display: flex; justify-content: center; margin-bottom: 15px;"></div>
-    <p style="font-size: 0.8rem; color: #666;">— o usa tu nombre —</p>
-    <input type="text" id="user-input" placeholder="Nombre de usuario">
+    <p>¡Bienvenido! Ingresa tu nombre para ordenar:</p>
+    <input type="text" id="user-input" placeholder="Tu nombre aquí...">
     <br>
-    <button onclick="checkAccess()">Entrar al Menú</button>
+    <button onclick="checkAccess()">Entrar</button>
 </div>
 
-<!-- Pantalla Principal -->
+<!-- App Principal -->
 <div id="app" class="container hidden">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h2 id="welcome-user" style="margin:0; font-size: 1.2rem;">Hola</h2>
+        <h2 id="welcome-user" style="margin:0;">Hola</h2>
         <button class="btn-logout" onclick="logout()">Salir</button>
     </div>
 
     <div class="payment-box">
-        <label style="font-weight: 600;">Método de Pago: </label>
+        <label>Método de Pago: </label>
         <select id="payment-method">
             <option value="Efectivo">💵 Efectivo</option>
             <option value="PinguCard Deud">💳 PinguCard Deud</option>
@@ -108,66 +96,62 @@
     <div class="product-grid" id="menu-container"></div>
 
     <div class="history-section">
-        <h3>Recibos Recientes</h3>
+        <h3>Historial de Compras</h3>
         <div id="history-list" class="history-list"></div>
         <center><button class="btn-clear" onclick="clearHistory()">Limpiar Historial</button></center>
     </div>
 </div>
 
 <script>
-    // --- CONFIGURACIÓN EMAILJS ---
-    const EMAILJS_PUBLIC_KEY = "TU_PUBLIC_KEY";
+    // --- 1. CONFIGURA TUS LLAVES AQUÍ ---
+    const EMAILJS_PUBLIC_KEY = "TU_PUBLIC_KEY"; 
     const EMAILJS_SERVICE_ID = "TU_SERVICE_ID";
     const EMAILJS_TEMPLATE_ID = "TU_TEMPLATE_ID";
 
     emailjs.init(EMAILJS_PUBLIC_KEY);
 
-    const defaultItems = [
+    // --- 2. DATOS INICIALES ---
+    const defaultProducts = [
         { id: 1, name: "Sandwiché", price: 45, stock: 10, icon: "🥪" },
         { id: 2, name: "Salchichas Catsup", price: 30, stock: 15, icon: "🌭" },
         { id: 3, name: "Huevito", price: 25, stock: 8, icon: "🍳" },
         { id: 4, name: "Pequesadilla", price: 35, stock: 12, icon: "🌮" }
     ];
 
-    let products = JSON.parse(localStorage.getItem('pm_stock')) || defaultItems;
-    let history = JSON.parse(localStorage.getItem('pm_history')) || [];
-    let currentUser = localStorage.getItem('pm_session');
+    let products = JSON.parse(localStorage.getItem('p_stock')) || defaultProducts;
+    let history = JSON.parse(localStorage.getItem('p_history')) || [];
+    let user = localStorage.getItem('p_user');
 
-    window.onload = () => { if (currentUser) startApp(currentUser); };
+    // Auto-login
+    window.onload = () => { if(user) startApp(user); };
 
     function checkAccess() {
         const val = document.getElementById('user-input').value.trim();
         if (val.toLowerCase() === 'reset') {
             localStorage.clear();
-            alert("Sistema reseteado correctamente.");
+            alert("Sistema reiniciado 🐧");
             location.reload();
         } else if (val.length >= 2) {
-            localStorage.setItem('pm_session', val);
+            localStorage.setItem('p_user', val);
             startApp(val);
         }
     }
 
-    function handleGoogle(response) {
-        localStorage.setItem('pm_session', "Usuario Google");
-        startApp("Usuario Google");
-    }
-
-    function startApp(name) {
+    function startApp(userName) {
         document.getElementById('login-box').classList.add('hidden');
         document.getElementById('app').classList.remove('hidden');
-        document.getElementById('welcome-user').innerText = `¡Hola, ${name}! 🐧`;
+        document.getElementById('welcome-user').innerText = `¡Hola, ${userName}! 🐧`;
         render();
     }
 
     function logout() {
-        localStorage.removeItem('pm_session');
+        localStorage.removeItem('p_user');
         location.reload();
     }
 
     function buy(id) {
         const p = products.find(x => x.id === id);
         const method = document.getElementById('payment-method').value;
-        const userName = localStorage.getItem('pm_session');
 
         if (p.stock > 0) {
             p.stock--;
@@ -177,34 +161,27 @@
                 method: method,
                 time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
             };
-            
             history.push(order);
             save();
             render();
-            sendEmail(userName, order);
+            
+            // Envío de correo automático
+            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+                user_name: localStorage.getItem('p_user'),
+                order_details: order.item,
+                total_price: `$${order.price}`,
+                payment_method: order.method
+            }).then(() => console.log("Correo enviado con éxito"));
         }
-    }
-
-    function sendEmail(user, order) {
-        const params = {
-            user_name: user,
-            order_details: order.item,
-            total_price: `$${order.price}`,
-            payment_method: order.method
-        };
-
-        emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params)
-            .then(() => console.log("Email enviado"))
-            .catch(err => console.error("Error EmailJS:", err));
     }
 
     function render() {
         document.getElementById('menu-container').innerHTML = products.map(p => `
             <div class="card">
-                <div style="font-size: 2.5rem; margin-bottom:10px;">${p.icon}</div>
+                <div style="font-size: 2.5rem; margin-bottom: 10px;">${p.icon}</div>
                 <h4 style="margin:5px 0;">${p.name}</h4>
                 <div class="price">$${p.price}</div>
-                <div style="font-size:0.7rem; color:#666; margin-bottom:12px;">Stock: ${p.stock}</div>
+                <div style="font-size: 0.7rem; color:#666; margin-bottom: 15px;">Stock: ${p.stock}</div>
                 <button onclick="buy(${p.id})" ${p.stock === 0 ? 'disabled' : ''}>
                     ${p.stock > 0 ? 'Comprar' : 'Agotado'}
                 </button>
@@ -212,17 +189,16 @@
         `).join('');
 
         const hList = document.getElementById('history-list');
-        hList.innerHTML = history.length ? 
-            history.map(h => `
-                <div class="history-item">
-                    <span><b>${h.item}</b> <span class="tag-pago">${h.method}</span></span>
-                    <span>$${h.price} <small style="color:#999; margin-left:5px;">${h.time}</small></span>
-                </div>
-            `).reverse().join('') : '<p style="text-align:center; color:#999; font-size:0.8rem;">No hay pedidos aún.</p>';
+        hList.innerHTML = history.length ? history.map(h => `
+            <div class="history-item">
+                <span><b>${h.item}</b> <span class="tag">${h.method}</span></span>
+                <span>$${h.price} <small style="color:#999; margin-left:5px;">${h.time}</small></span>
+            </div>
+        `).reverse().join('') : '<p style="text-align:center; color:#999; font-size:0.8rem;">Aún no has pedido nada.</p>';
     }
 
     function clearHistory() {
-        if(confirm("¿Seguro que quieres borrar el historial?")) {
+        if(confirm("¿Borrar recibos?")) {
             history = [];
             save();
             render();
@@ -230,10 +206,12 @@
     }
 
     function save() {
-        localStorage.setItem('pm_stock', JSON.stringify(products));
-        localStorage.setItem('pm_history', JSON.stringify(history));
+        localStorage.setItem('p_stock', JSON.stringify(products));
+        localStorage.setItem('p_history', JSON.stringify(history));
     }
 </script>
+
 </body>
-  </html>
+</html>
+
   
